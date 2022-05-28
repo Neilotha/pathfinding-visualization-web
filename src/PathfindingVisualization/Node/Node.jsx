@@ -9,6 +9,7 @@ class Node extends Component {
       row,
       col,
       isVisited,
+      distance,
       isWall,
       isStart,
       isFinish,
@@ -17,7 +18,7 @@ class Node extends Component {
       onMouseUp
     } = this.props;
 
-    const classes = 'node noselect' + 
+    const classes = 'node' + 
     (isWall ? " isWall" 
     : isStart ? " isStart" 
     : isFinish ? " isFinish"
