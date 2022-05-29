@@ -17,3 +17,11 @@
 .isFinish {
   background-color: rgb(172, 41, 68);
 }
+
+.visited {
+  background-color:rgba(27, 190, 215, 0.898)
+}
+
+.shortestPath {
+  background-color: rgb(123, 71, 183);
+}

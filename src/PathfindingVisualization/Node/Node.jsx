@@ -8,8 +8,6 @@ class Node extends Component {
     const {
       row,
       col,
-      isVisited,
-      distance,
       isWall,
       isStart,
       isFinish,

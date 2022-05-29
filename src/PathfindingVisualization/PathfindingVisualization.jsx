@@ -2,6 +2,7 @@ import {Component} from 'react';
 import Node from './Node/Node';
 
 import './PathfindingVisualization.css';
+import {dijkstra, getShortestPath} from '../PathfindingAlgorithms/Dijkstra.js';
 
 const TOGGLE_WALL = '1';
 const TOGGLE_START = '2';
@@ -26,6 +27,59 @@ export default class PathfindingVisualization extends Component {
   componentDidMount() {
     const grid = initializeGrid();
     this.setState({grid});
+  }
+
+  visualizeDijkstra() {
+    const {grid} = this.state;
+    const finishNode = this.findFinishNode(grid);
+    const startNode = this.findStartNode(grid);
+    const visitedNodes = dijkstra(grid, startNode);
+    const shortestPath = getShortestPath(finishNode);
+    this.animateDijkstra(visitedNodes, shortestPath)
+
+  }
+
+  animateDijkstra(visitedNodes, shortestPath) {
+    for( let i = 1; i < visitedNodes.length; i ++ ) {
+      if ( i === visitedNodes.length - 1 ) {
+        setTimeout( () => {
+          this.animateShortestPath( shortestPath );
+        }, 5 * i)
+      }
+      setTimeout( () => {
+        const node = visitedNodes[i];
+        document.getElementById( `${node.row}-${node.col}` ).className = 'node visited';
+      }, 5* i)
+    }
+  }
+
+  animateShortestPath(shortestPath) {
+    for( let i = 1; i < shortestPath.length - 1; i ++ ) {
+      setTimeout( () => {
+        const node = shortestPath[i];
+        document.getElementById( `${node.row}-${node.col}` ).className = 'node shortestPath';
+      }, 20 * i)
+    }
+  }
+
+  // Finds the start node form the grid
+  findStartNode(grid) {
+    let startNode = null;
+    for ( const row of grid ) {
+      startNode = row.find(node => node.isStart );
+      if( startNode !== undefined ) break;
+    }
+    return startNode;
+  }
+
+  // Finds the finish node from the grid
+  findFinishNode(grid) {
+    let finishNode = null;
+    for ( const row of grid ) {
+      finishNode = row.find(node => node.isFinish );
+      if( finishNode !== undefined ) break;
+    }
+    return finishNode;
   }
 
   // Validates the action the user wants to performe
@@ -106,19 +160,28 @@ export default class PathfindingVisualization extends Component {
 
   // Resets the whole state
   handleReset() {
+    const list = document.querySelectorAll('.visited, .shortestPath'); 
+    for (let i = 0; i < list.length; i ++) {
+      list[i].className = 'node';
+    }
+
+    const newGrid = initializeGrid();
     this.setState({
-      grid: initializeGrid(),
+      grid: newGrid,
       mouseIsPressed: false,
       gotStart: false,
       gotFinish: false,
       wallToggled: false
-    })
+    });
   }
 
   render() {
     const {grid} = this.state;
     return (
       <>
+        <button onClick={() => this.visualizeDijkstra()}>
+          Visualize Dijkstra's Algorithm
+        </button>
         <button onClick = {() => this.handleStartToggle()}>Start</button>
         <button onClick = {() => this.handleFinishToggle()}>Finish</button>
         <button onClick = {() => this.handleWallToggle()}>Wall</button>
@@ -128,13 +191,12 @@ export default class PathfindingVisualization extends Component {
             return(
               <div className='row' key={rowId}>
                 {row.map((node, nodeId) => {
-                  const {row, col, isVisited, isWall, isStart, isFinish} = node;
+                  const {row, col, isWall, isStart, isFinish} = node;
                   return(
                     <Node
                       key = {nodeId}
                       row = {row}
                       col = {col}
-                      isVisited = {isVisited}
                       isWall = {isWall}
                       isStart = {isStart}
                       isFinish = {isFinish}
@@ -172,6 +234,7 @@ const initializeNode = (row, col) => {
   return{
     row,
     col,
+    previouseNode: null,
     distance: Infinity,
     isVisited: false,
     isWall: false,
@@ -199,7 +262,6 @@ const initializeStartNode = (row, col, grid) => {
   const newNode = {
     ...node,
     isStart: true,
-    distance: 0,
   };
   newGrid[row][col] = newNode;
   return newGrid;
