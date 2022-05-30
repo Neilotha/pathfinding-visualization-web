@@ -3,6 +3,7 @@ import Node from './Node/Node';
 
 import './PathfindingVisualization.css';
 import {dijkstra, getShortestPath} from '../PathfindingAlgorithms/Dijkstra.js';
+import {animateDijkstra} from './Animations.jsx';
 
 const TOGGLE_WALL = '1';
 const TOGGLE_START = '2';
@@ -35,32 +36,11 @@ export default class PathfindingVisualization extends Component {
     const startNode = this.findStartNode(grid);
     const visitedNodes = dijkstra(grid, startNode);
     const shortestPath = getShortestPath(finishNode);
-    this.animateDijkstra(visitedNodes, shortestPath)
+    animateDijkstra(visitedNodes, shortestPath)
 
   }
 
-  animateDijkstra(visitedNodes, shortestPath) {
-    for( let i = 1; i < visitedNodes.length; i ++ ) {
-      if ( i === visitedNodes.length - 1 ) {
-        setTimeout( () => {
-          this.animateShortestPath( shortestPath );
-        }, 5 * i)
-      }
-      setTimeout( () => {
-        const node = visitedNodes[i];
-        document.getElementById( `${node.row}-${node.col}` ).className = 'node visited';
-      }, 5* i)
-    }
-  }
 
-  animateShortestPath(shortestPath) {
-    for( let i = 1; i < shortestPath.length - 1; i ++ ) {
-      setTimeout( () => {
-        const node = shortestPath[i];
-        document.getElementById( `${node.row}-${node.col}` ).className = 'node shortestPath';
-      }, 20 * i)
-    }
-  }
 
   // Finds the start node form the grid
   findStartNode(grid) {
