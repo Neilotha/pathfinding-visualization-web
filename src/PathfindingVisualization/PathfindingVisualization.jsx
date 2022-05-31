@@ -2,8 +2,9 @@ import {Component} from 'react';
 import Node from './Node/Node';
 
 import './PathfindingVisualization.css';
-import {dijkstra, getShortestPath} from '../PathfindingAlgorithms/Dijkstra.js';
-import {animateDijkstra} from './Animations.jsx';
+import {dijkstra, getShortestPathDijkstra} from '../PathfindingAlgorithms/Dijkstra.js';
+import {aStar} from '../PathfindingAlgorithms/Astar.js';
+import {animateDijkstra, animateAStar} from './Animations.jsx';
 
 const TOGGLE_WALL = '1';
 const TOGGLE_START = '2';
@@ -35,11 +36,20 @@ export default class PathfindingVisualization extends Component {
     const finishNode = this.findFinishNode(grid);
     const startNode = this.findStartNode(grid);
     const visitedNodes = dijkstra(grid, startNode);
-    const shortestPath = getShortestPath(finishNode);
-    animateDijkstra(visitedNodes, shortestPath)
+    const shortestPath = getShortestPathDijkstra(finishNode);
+    animateDijkstra(visitedNodes, shortestPath);
 
   }
 
+  visualizeAstar() {
+    const {grid} = this.state;
+    const finishNode = this.findFinishNode(grid);
+    const startNode = this.findStartNode(grid);
+    const results = aStar(grid, startNode, finishNode);
+    const visitedNodes = results[0];
+    const shortestPath = results[1];
+    animateAStar(visitedNodes, shortestPath);
+  }
 
 
   // Finds the start node form the grid
@@ -159,13 +169,18 @@ export default class PathfindingVisualization extends Component {
     const {grid} = this.state;
     return (
       <>
-        <button onClick={() => this.visualizeDijkstra()}>
-          Visualize Dijkstra's Algorithm
-        </button>
-        <button onClick = {() => this.handleStartToggle()}>Start</button>
-        <button onClick = {() => this.handleFinishToggle()}>Finish</button>
-        <button onClick = {() => this.handleWallToggle()}>Wall</button>
-        <button onClick = {() => this.handleReset()}>Reset</button>
+        <div className="panel">
+          <button onClick={() => this.visualizeDijkstra()}>
+            Visualize Dijkstra's Algorithm
+          </button>
+          <button onClick={() => this.visualizeAstar()}>
+            Visualize A* Algorithm
+          </button>
+          <button onClick = {() => this.handleStartToggle()}>Start</button>
+          <button onClick = {() => this.handleFinishToggle()}>Finish</button>
+          <button onClick = {() => this.handleWallToggle()}>Wall</button>
+          <button onClick = {() => this.handleReset()}>Reset</button>
+        </div>
         <div className='grid noselect'>
           {grid.map((row, rowId) => {
             return(
@@ -214,7 +229,7 @@ const initializeNode = (row, col) => {
   return{
     row,
     col,
-    previouseNode: null,
+    previousNode: null,
     distance: Infinity,
     isVisited: false,
     isWall: false,

@@ -32,12 +32,12 @@ export function dijkstra(grid, startNode) {
 }
 
 // get the shortest path by back tracking from the finish node
-export function getShortestPath(finishNode) {
+export function getShortestPathDijkstra(finishNode) {
     const shortestPath = [];
     let currentNode = finishNode;
     while( currentNode !== null ) {
         shortestPath.unshift(currentNode);
-        currentNode = currentNode.previouseNode;
+        currentNode = currentNode.previousNode;
     }
 
     return shortestPath;
@@ -65,7 +65,7 @@ function updateAdjacentNodes(grid, currentNode) {
         // update adjacent node's distance
         adjacentNode.distance = currentNode.distance + 1;
         // update Adjacent node's previous node to current node
-        adjacentNode.previouseNode = currentNode;
+        adjacentNode.previousNode = currentNode;
     }
 }
 

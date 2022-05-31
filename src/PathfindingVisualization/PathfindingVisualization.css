@@ -1,6 +1,10 @@
 .grid {
-    margin: 100px 0 0;
-  }
+  margin: 100px 0 0;
+}
+
+.panel {
+  margin: 100px 0 0;
+}
 
 .row {
     height: 25px;
@@ -15,3 +19,4 @@
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Opera and Firefox */
   }
+
