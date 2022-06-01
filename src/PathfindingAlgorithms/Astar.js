@@ -15,12 +15,10 @@ export function aStar(grid, startNode, targetNode) {
         // Find the node with the smallest f-value on the open list and pop it
         const currentNode = getNearestNode(openList);
         removeElement(openList, currentNode);
-        currentNode.isVisited = true;
         // Push currentNode to closed list
         closedList.push(currentNode);
         // If the currentNode is the goal, stop the search
         if( currentNode.isFinish ) {
-            currentNode.isVisited = true;
             finishSearch = true;
         }
         else {

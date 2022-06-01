@@ -154,13 +154,56 @@ export default class PathfindingVisualization extends Component {
     for (let i = 0; i < list.length; i ++) {
       list[i].className = 'node';
     }
-
+    
     const newGrid = initializeGrid();
     this.setState({
       grid: newGrid,
       mouseIsPressed: false,
       gotStart: false,
       gotFinish: false,
+      wallToggled: false
+    });
+  }
+
+  // Clear the previous search result
+  handleClearSearch() {
+    const gridCoppy = this.state.grid.slice();
+    const list = document.querySelectorAll('.visited, .shortestPath'); 
+    for (let i = 0; i < list.length; i ++) {
+      list[i].className = 'node';
+    }
+
+    for( const row of gridCoppy ) {
+      for( const node of row ) {
+        node.previousNode = null;
+        node.isVisited = false;
+      }
+    }
+
+    this.setState({
+      grid: gridCoppy,
+      mouseIsPressed: false,
+      wallToggled: false
+    });
+  }
+
+  // Clear wall node and search result 
+  handleClearWall() {
+    this.handleClearSearch();
+    const gridCoppy = this.state.grid.slice();
+
+    for( let row = 0; row < gridCoppy.length; row ++ ) {
+      for( let col = 0; col < gridCoppy[0].length; col ++ ) {
+        console.log(gridCoppy[row][col]);
+        if( gridCoppy[row][col].isWall ) {
+          gridCoppy[row][col] = initializeNode(row, col);
+        }
+      }
+    }
+
+    this.setState({
+      grid: gridCoppy,
+      mouseIsPressed: false,
       wallToggled: false
     });
   }
@@ -179,7 +222,9 @@ export default class PathfindingVisualization extends Component {
           <button onClick = {() => this.handleStartToggle()}>Start</button>
           <button onClick = {() => this.handleFinishToggle()}>Finish</button>
           <button onClick = {() => this.handleWallToggle()}>Wall</button>
-          <button onClick = {() => this.handleReset()}>Reset</button>
+          <button onClick = {() => this.handleReset()}>Reset Board</button>
+          <button onClick = {() => this.handleClearWall()}>Clear Wall</button>
+          <button onClick = {() => this.handleClearSearch()}>Clear Search</button>
         </div>
         <div className='grid noselect'>
           {grid.map((row, rowId) => {
