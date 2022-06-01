@@ -29,32 +29,29 @@ export function aStar(grid, startNode, targetNode) {
             const successors = getSuccessor(grid, currentNode);
             for( const successor of successors ) {
                 // Calculate h-value and g-value of successor
-                const successorF = calculateFValue(currentNode, targetNode, successor);
-                // console.log('g-value', successorF[0]);
-                // console.log('h-value', successorF[1]);
-                // If neighbor has lower g value than current and is in the closed list
-                if( successorF[0] < currentNode.g && checkIfExist(closedList, successor) ) {
-                    console.log('branch1');
+                const successorNewF = calculateFValue(currentNode, targetNode, successor);
+                // If the new path to neighbor has better g-value than the current best path
+                // and the neighbor is already in the closed list
+                if( successorNewF[0] < successor.g && checkIfExist(closedList, successor) ) {
                     // replace the neighbor with the new, lower, g value 
                     // current node is now the neighbor's parent 
-                    successor.g = successorF[0];
+                    successor.g = successorNewF[0];
                     successor.previousNode = currentNode;
                 }
-                // else if current g value is lower and this neighbor is in the open list 
-                else if( successorF[0] < currentNode.g && checkIfExist(openList, successor) ) {
-                    console.log('branch2');
+                // else if the new path to neighbor has better g-value than the current best path
+                // and the neighbor is already in the open list
+                else if( successorNewF[0] < successor.g && checkIfExist(openList, successor) ) {
                     //  replace the neighbor with the new, lower, g value 
                     //  change the neighbor's parent to our current node
-                    successor.g = successorF[0];
+                    successor.g = successorNewF[0];
                     successor.previousNode = currentNode;
                 }
                 // else if this neighbor is not in both lists
                 else if( !checkIfExist(closedList, successor) && !checkIfExist(openList, successor) ) {
                     // add it to the open list and set its g and h
-                    console.log('branch3');
                     successor.previousNode = currentNode;
-                    successor.g = successorF[0];
-                    successor.h = successorF[1];
+                    successor.g = successorNewF[0];
+                    successor.h = successorNewF[1];
                     openList.push(successor);
                 }
 
