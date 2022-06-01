@@ -27,6 +27,8 @@ export default class PathfindingVisualization extends Component {
   }
 
   componentDidMount() {
+    document.body.style.overflow = "hidden";
+    document.body.classList.add("no-scroll");
     const grid = initializeGrid();
     this.setState({grid});
   }
