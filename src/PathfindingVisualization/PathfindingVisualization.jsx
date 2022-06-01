@@ -1,4 +1,4 @@
-import {Component} from 'react';
+import React, {Component} from 'react';
 import Node from './Node/Node';
 
 import './PathfindingVisualization.css';
@@ -258,9 +258,11 @@ export default class PathfindingVisualization extends Component {
 // Initialize an 2D array of nodes 
 const initializeGrid = () => {
   const grid = [];
-  for (let row = 0; row < 30; row ++) {
+  const height = window.innerHeight - 150;
+  const width = window.innerWidth;
+  for (let row = 0; row < height/25 - 1; row ++) {
     const currentRow = [];
-    for (let col = 0; col < 60; col ++) {
+    for (let col = 0; col < width/25 - 1; col ++) {
       currentRow.push(initializeNode(row, col));
     }      
     grid.push(currentRow);
