@@ -3,6 +3,7 @@ export function dijkstra(grid, startNode) {
     let finishSearch = false;
     const visitedNodes = [];
     const unvisitedNodes = getAllNodes(grid);
+    prepareBoard(grid);
     // Set the distance of start node to 0
     startNode.distance = 0;
 
@@ -81,4 +82,11 @@ function getAdjacentNodes(grid, node) {
     return neighborNodes.filter((neighbor) => !neighbor.isVisited);
 }
 
-
+// utility funciotn for initializing the node's distance to infinity
+function prepareBoard(grid) {
+    for( const row of grid ) {
+        for( const node of row ) {
+            node.distance = Infinity;
+        }
+    }
+}
