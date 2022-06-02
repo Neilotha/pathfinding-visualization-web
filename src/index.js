@@ -1,4 +1,7 @@
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import $ from 'jquery';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';

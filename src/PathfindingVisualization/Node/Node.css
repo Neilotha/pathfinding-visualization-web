@@ -34,21 +34,71 @@
     transform: scale(1);
     border-radius: 0%;
     background-color: rgb(50, 45, 45);
-    outline: 1px solid rgba(148, 229, 241, 0.898);
     outline: 1px solid rgb(50, 45, 45);
   }
 }
 
 .isStart {
-  background-color: rgb(24, 241, 0);
-  outline: none;
-  border-radius: 40%;
+  animation-name: startNodeAnimation;
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+@keyframes startNodeAnimation {
+  from {
+    outline: none;
+    background-color: rgb(24, 241, 0);
+    transform: scale(0.8);
+    border-radius: 100%;
+
+  }
+
+  80% {
+    transform: scale(1.1);
+  }
+
+  to {
+    transform: scale(1);
+    border-radius: 40%;
+    background-color: rgb(24, 241, 0);
+    outline: 1px solid rgba(148, 229, 241, 0.898);
+  }
 }
 
 .isFinish {
-  background-color: rgb(172, 41, 68);
-  outline: none;
-  border-radius: 40%;
+  animation-name: finishNodeAnimation;
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+@keyframes finishNodeAnimation {
+  from {
+    outline: none;
+    background-color: rgb(172, 41, 68);
+    transform: scale(0.8);
+    border-radius: 100%;
+
+  }
+
+  80% {
+    transform: scale(1.1);
+  }
+
+  to {
+    transform: scale(1);
+    border-radius: 40%;
+    background-color: rgb(172, 41, 68);
+    outline: 1px solid rgba(148, 229, 241, 0.898);
+  }
 }
 
 .visited {

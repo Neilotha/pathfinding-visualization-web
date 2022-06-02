@@ -16,11 +16,13 @@ export default class PathfindingVisualization extends Component {
     this.state = {
       grid: [],
       mouseIsPressed: false,
-      gotStart: false,
-      gotFinish: false,
-      wallToggled: false,
-      startToggled: false,
-      finishToggled: false
+      // gotStart: false,
+      // gotFinish: false,
+      draggingStart: false,
+      draggngFinish: false,
+      // wallToggled: false,
+      // startToggled: false,
+      // finishToggled: false
     };
 
 
@@ -28,8 +30,6 @@ export default class PathfindingVisualization extends Component {
 
   componentDidMount() {
     const grid = initializeGrid();
-    document.body.style.overflow = "hidden";
-    document.body.classList.add("no-scroll");
     this.setState({grid});
   }
 
@@ -109,25 +109,47 @@ export default class PathfindingVisualization extends Component {
 
   handleMouseDown(row, col) {
     this.setState({mouseIsPressed: true});
-      // Adding wall node
-    if (this.state.wallToggled && this.validateAction(row, col, TOGGLE_WALL)) {
+    // Clicking on the start node
+    if ( this.state.grid[row][col].isStart && !this.state.draggingStart && !this.state.draggngFinish ) {
+      this.setState( { draggingStart: true } );
+    }
+    // Clicking on the finish node
+    else if ( this.state.grid[row][col].isFinish && !this.state.draggingStart && !this.state.draggngFinish ) {
+      this.setState( { draggngFinish: true } );
+    }
+    // Adding wall node
+    // else if (this.state.wallToggled && this.validateAction(row, col, TOGGLE_WALL)) {
+    else if ( this.validateAction(row, col, TOGGLE_WALL)) {
+
       const newGrid = initializeWallNode(row, col, this.state.grid);
       this.setState({grid: newGrid});
     }
-    else if (this.state.startToggled && this.validateAction(row, col, TOGGLE_START)) {
-      const newGrid = initializeStartNode(row, col, this.state.grid);
-      this.setState({grid: newGrid, startToggled: false, gotStart: true});
-    }
-    else if (this.state.finishToggled && this.validateAction(row, col, TOGGLE_FINISH)) {
-      const newGrid = initializeFinishNode(row, col, this.state.grid);
-      this.setState({grid: newGrid, finishToggled: false, gotFinish: true});
-    }
+    // else if (this.state.startToggled && this.validateAction(row, col, TOGGLE_START)) {
+    //   const newGrid = initializeStartNode(row, col, this.state.grid);
+    //   this.setState({grid: newGrid, startToggled: false, gotStart: true});
+    // }
+    // else if (this.state.finishToggled && this.validateAction(row, col, TOGGLE_FINISH)) {
+    //   const newGrid = initializeFinishNode(row, col, this.state.grid);
+    //   this.setState({grid: newGrid, finishToggled: false, gotFinish: true});
+    // }
   }
 
   handleMouseEnter(row, col) {
     if (this.state.mouseIsPressed) {
+      // Dragging start node, putting down start node if finish node isn't already there
+      if ( this.state.draggingStart && !this.state.grid[row][col].isFinish ) {
+        const newGrid = dragStartOrFinishNode( this.findStartNode( this.state.grid ), this.state.grid, true, row, col );
+        this.setState( { grid: newGrid } );
+      }
+      //  Dragging finish node, putting down finish node if start node isn't already there
+      else if ( this.state.draggngFinish && !this.state.grid[row][col].isStart ) {
+        const newGrid = dragStartOrFinishNode( this.findFinishNode( this.state.grid ), this.state.grid, false, row, col );
+        this.setState( { grid: newGrid } );
+      }
       // Adding wall node
-      if (this.state.wallToggled && this.validateAction(row, col, TOGGLE_WALL)) {
+      // else if (this.state.wallToggled && this.validateAction(row, col, TOGGLE_WALL)) {
+      else if (this.validateAction(row, col, TOGGLE_WALL)) {
+
         const newGrid = initializeWallNode(row, col, this.state.grid);
         this.setState({grid: newGrid});
       }
@@ -135,7 +157,9 @@ export default class PathfindingVisualization extends Component {
   }
 
   handleMouseUp() {
-    this.setState({mouseIsPressed: false});
+    const wasDragging = this.state.draggingStart || this.state.draggngFinish;
+    this.setState({mouseIsPressed: false, draggingStart: false, draggngFinish: false});
+    if ( wasDragging ) this.handleClearSearch();
   }
 
   handleWallToggle() {
@@ -161,9 +185,9 @@ export default class PathfindingVisualization extends Component {
     this.setState({
       grid: newGrid,
       mouseIsPressed: false,
-      gotStart: false,
-      gotFinish: false,
-      wallToggled: false
+      // gotStart: false,
+      // gotFinish: false,
+      // wallToggled: false
     });
   }
 
@@ -185,7 +209,7 @@ export default class PathfindingVisualization extends Component {
     this.setState({
       grid: gridCoppy,
       mouseIsPressed: false,
-      wallToggled: false
+      // wallToggled: false
     });
   }
 
@@ -206,7 +230,7 @@ export default class PathfindingVisualization extends Component {
     this.setState({
       grid: gridCoppy,
       mouseIsPressed: false,
-      wallToggled: false
+      // wallToggled: false
     });
   }
 
@@ -221,9 +245,9 @@ export default class PathfindingVisualization extends Component {
           <button onClick={() => this.visualizeAstar()}>
             Visualize A* Algorithm
           </button>
-          <button onClick = {() => this.handleStartToggle()}>Start</button>
+          {/* <button onClick = {() => this.handleStartToggle()}>Start</button>
           <button onClick = {() => this.handleFinishToggle()}>Finish</button>
-          <button onClick = {() => this.handleWallToggle()}>Wall</button>
+          <button onClick = {() => this.handleWallToggle()}>Wall</button> */}
           <button onClick = {() => this.handleReset()}>Reset Board</button>
           <button onClick = {() => this.handleClearWall()}>Clear Wall</button>
           <button onClick = {() => this.handleClearSearch()}>Clear Search</button>
@@ -262,13 +286,18 @@ const initializeGrid = () => {
   const grid = [];
   const height = window.innerHeight - 150;
   const width = window.innerWidth;
-  for (let row = 0; row < height/25 - 1; row ++) {
+  const totalRow = Math.floor( height / 25 );
+  const totalCol = Math.floor( width / 25 );
+  for (let row = 0; row < totalRow; row ++) {
     const currentRow = [];
-    for (let col = 0; col < width/25 - 1; col ++) {
+    for (let col = 0; col < totalCol; col ++) {
       currentRow.push(initializeNode(row, col));
     }      
     grid.push(currentRow);
   }
+
+  initializeStartNode( Math.floor( totalRow / 2 ), Math.floor( totalCol / 3 ), grid );
+  initializeFinishNode( Math.floor( totalRow / 2 ), Math.floor( ( totalCol / 3 ) * 2 ), grid );
 
   return grid;
 };
@@ -282,6 +311,7 @@ const initializeNode = (row, col) => {
     distance: Infinity,
     isVisited: false,
     isWall: false,
+    wasWall: false,
     isStart: false,
     isFinish: false
   };
@@ -296,29 +326,62 @@ const initializeWallNode = (row, col, grid) => {
     isWall: !node.isWall,
   };
   newGrid[row][col] = newNode;
+
   return newGrid;
 };
 
 // Initializes a start node and returns a new grid containing the new node
 const initializeStartNode = (row, col, grid) => {
   const newGrid = grid.slice();
+  const oldNode = newGrid[row][col];
   const node = initializeNode(row, col);
   const newNode = {
     ...node,
     isStart: true,
+    wasWall: oldNode.isWall,
   };
   newGrid[row][col] = newNode;
+
   return newGrid;
 };
 
 // Initializes a finish node and returns a new grid containing the new node
 const initializeFinishNode = (row, col, grid) => {
   const newGrid = grid.slice();
+  const oldNode = newGrid[row][col];
   const node = initializeNode(row, col);
   const newNode = {
     ...node,
     isFinish: true,
+    wasWall: oldNode.isWall,
   };
   newGrid[row][col] = newNode;
+
   return newGrid;
 };
+
+// Discard start or finish node, also restore wall node if the node was a wall node
+// then initialize a start or finish node on the given position
+const dragStartOrFinishNode = (node, grid, isStart, targetRow, targetCol) => {
+  let newGrid = grid.slice();
+  const row = node.row;
+  const col = node.col;
+  if ( node.wasWall ) {
+    newGrid[row][col] = initializeNode(row, col);
+    newGrid = initializeWallNode(row, col, newGrid);
+  }
+  else {
+    newGrid[row][col] = initializeNode(row, col);
+  }
+
+  
+
+  if ( isStart ) {
+    newGrid = initializeStartNode( targetRow, targetCol, newGrid );
+  }
+  else {
+    newGrid = initializeFinishNode( targetRow, targetCol, newGrid );
+  }
+
+  return newGrid;
+}
