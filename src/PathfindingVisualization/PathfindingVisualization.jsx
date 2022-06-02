@@ -34,6 +34,7 @@ export default class PathfindingVisualization extends Component {
   }
 
   visualizeDijkstra() {
+    this.handleClearSearch();
     const {grid} = this.state;
     const finishNode = this.findFinishNode(grid);
     const startNode = this.findStartNode(grid);
@@ -44,6 +45,7 @@ export default class PathfindingVisualization extends Component {
   }
 
   visualizeAstar() {
+    this.handleClearSearch();
     const {grid} = this.state;
     const finishNode = this.findFinishNode(grid);
     const startNode = this.findStartNode(grid);
