@@ -241,18 +241,23 @@ export default class PathfindingVisualization extends Component {
     return (
       <>
         <div className="panel">
-          <button onClick={() => this.visualizeDijkstra()}>
-            Visualize Dijkstra's Algorithm
-          </button>
-          <button onClick={() => this.visualizeAstar()}>
-            Visualize A* Algorithm
-          </button>
+          <h1 className='title'>Pathfinding Visualization</h1>
+          <div className='btn-group' role="group">
+            <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeDijkstra()}>
+              Visualize Dijkstra's Algorithm
+            </button>
+            <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeAstar()}>
+              Visualize A* Algorithm
+            </button>
+          </div>
           {/* <button onClick = {() => this.handleStartToggle()}>Start</button>
           <button onClick = {() => this.handleFinishToggle()}>Finish</button>
           <button onClick = {() => this.handleWallToggle()}>Wall</button> */}
-          <button onClick = {() => this.handleReset()}>Reset Board</button>
-          <button onClick = {() => this.handleClearWall()}>Clear Wall</button>
-          <button onClick = {() => this.handleClearSearch()}>Clear Search</button>
+          <div className='btn-group' role="group">
+            <button type="button" className='btn btn-outline-light' onClick = {() => this.handleReset()}>Reset Board</button>
+            <button type="button" className='btn btn-outline-light' onClick = {() => this.handleClearWall()}>Clear Wall</button>
+            <button type="button" className='btn btn-outline-light' onClick = {() => this.handleClearSearch()}>Clear Search</button>
+          </div>
         </div>
         <div className='grid noselect'>
           {grid.map((row, rowId) => {
@@ -283,10 +288,14 @@ export default class PathfindingVisualization extends Component {
   }
 }
 
+function convertRemToPixels(rem) {
+  return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+}
+
 // Initialize an 2D array of nodes 
 const initializeGrid = () => {
   const grid = [];
-  const height = window.innerHeight - 150;
+  const height = window.innerHeight - convertRemToPixels(6);
   const width = window.innerWidth;
   const totalRow = Math.floor( height / 25 );
   const totalCol = Math.floor( width / 25 );
