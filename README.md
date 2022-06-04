@@ -1,6 +1,6 @@
 # PathFinding Visualizer:
 
-(https://neilotha.github.io/pathfinding-visualization-web/)
+Hosted at: https://neilotha.github.io/pathfinding-visualization-web/
 
 # Getting Started with Create React App
 
