@@ -101,6 +101,11 @@
   }
 }
 
+
+.visited-instant {
+  background-color:rgba(37, 190, 214, 0.898);
+}
+
 .visited {
   animation-name: visitedNodeAnimation;
   animation-duration: 2s;
@@ -139,6 +144,10 @@
     transform: scale(1);
     background-color:rgba(37, 190, 214, 0.898);
   }
+}
+
+.shortestPath-instant {
+  background-color: rgb(123, 71, 183);
 }
 
 .shortestPath {
