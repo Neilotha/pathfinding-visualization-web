@@ -154,12 +154,15 @@ export default class PathfindingVisualization extends Component {
       if ( this.state.draggingStart && !this.state.grid[row][col].isFinish ) {
         const newGrid = dragStartOrFinishNode( this.findStartNode( this.state.grid ), this.state.grid, true, row, col );
         this.setState( { grid: newGrid } );
+        if ( this.state.wasSearched && this.state.searchedAlgorithm !== null ) {
+          if ( this.state.searchedAlgorithm === DIJKSTRA ) this.visualizeDijkstra( true );
+          else if ( this.state.searchedAlgorithm === ASTAR ) this.visualizeAstar( true );
+        } 
       }
       //  Dragging finish node, putting down finish node if start node isn't already there
       else if ( this.state.draggngFinish && !this.state.grid[row][col].isStart ) {
         const newGrid = dragStartOrFinishNode( this.findFinishNode( this.state.grid ), this.state.grid, false, row, col );
         this.setState( { grid: newGrid } );
-        console.log(this.state.wasSearched, this.state.searchedAlgorithm);
         if ( this.state.wasSearched && this.state.searchedAlgorithm !== null ) {
           if ( this.state.searchedAlgorithm === DIJKSTRA ) this.visualizeDijkstra( true );
           else if ( this.state.searchedAlgorithm === ASTAR ) this.visualizeAstar( true );
@@ -263,7 +266,6 @@ export default class PathfindingVisualization extends Component {
 
     for( let row = 0; row < gridCoppy.length; row ++ ) {
       for( let col = 0; col < gridCoppy[0].length; col ++ ) {
-        console.log(gridCoppy[row][col]);
         if( gridCoppy[row][col].isWall ) {
           gridCoppy[row][col] = initializeNode(row, col);
         }
@@ -282,7 +284,7 @@ export default class PathfindingVisualization extends Component {
     return (
       <>
         <div className="panel">
-          <h1 className='title'>Pathfinding Visualization</h1>
+          <h1 className='title'>Pathfinding Visualization test</h1>
           <div className='btn-group' role="group">
             <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeDijkstra( false )}>
               Visualize Dijkstra's Algorithm

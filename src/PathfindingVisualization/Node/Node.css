@@ -147,7 +147,7 @@
 }
 
 .shortestPath-instant {
-  background-color: rgb(123, 71, 183);
+  background-color: rgb(43, 80, 153);
 }
 
 .shortestPath {
@@ -177,11 +177,11 @@
   70% {
     border-radius: 20%;
     transform: scale(1.1);
-    background-color: rgb(227, 14, 184);
+    background-color: rgb(14, 81, 227);
   }
 
   to {
     transform: scale(1.0);
-    background-color: rgb(123, 71, 183);
+    background-color: rgb(43, 80, 153);
   }
 }
