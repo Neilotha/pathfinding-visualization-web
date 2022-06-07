@@ -101,6 +101,11 @@
   }
 }
 
+
+.visited-instant {
+  background-color:rgba(37, 190, 214, 0.898);
+}
+
 .visited {
   animation-name: visitedNodeAnimation;
   animation-duration: 2s;
@@ -141,6 +146,10 @@
   }
 }
 
+.shortestPath-instant {
+  background-color: rgb(43, 80, 153);
+}
+
 .shortestPath {
   animation-name: shortestPathAnimation;
   animation-duration: 1.5s;
@@ -168,11 +177,11 @@
   70% {
     border-radius: 20%;
     transform: scale(1.1);
-    background-color: rgb(227, 14, 184);
+    background-color: rgb(14, 81, 227);
   }
 
   to {
     transform: scale(1.0);
-    background-color: rgb(123, 71, 183);
+    background-color: rgb(43, 80, 153);
   }
 }

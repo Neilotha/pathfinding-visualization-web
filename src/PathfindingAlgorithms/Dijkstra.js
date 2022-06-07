@@ -1,30 +1,29 @@
+import { MinPriorityQueue } from "./MinPrioirtyQueue";
+
 export function dijkstra(grid, startNode) {
     // Stores the order of visited nodes
     let finishSearch = false;
     const visitedNodes = [];
-    const unvisitedNodes = getAllNodes(grid);
+    const unvisitedNodes = new MinPriorityQueue();
     prepareBoard(grid);
-    // Set the distance of start node to 0
+    // Set the distance of start node to 0 
     startNode.distance = 0;
+    // Push the startNode into the min priority queue
+    unvisitedNodes.insert(startNode);  
 
     // the loop stops when 1: found the shortest path to finish 2: realize there is no way to reach the finish
     while( !finishSearch ) {
-        sortNodesByDistance(unvisitedNodes);
-        // get the node with the shortest distance
-        const currentNode = unvisitedNodes.shift();
-        // inspect the node
-        // if the current node is a wall node, skip it
-        if( currentNode.isWall ) continue;
         // if the distance of the current node is infinity, it means that we are traped and there is no way of reaching the finish
         // put the current node into the visited node set
-        currentNode.isVisited = true;
-        if( currentNode.distance === Infinity ) finishSearch = true;
+        if( unvisitedNodes.size === 0 ) finishSearch = true;
         else {
+            let currentNode = unvisitedNodes.extractMin();
+            currentNode.isVisited = true;
             if( currentNode.isFinish ) finishSearch = true;
             else { 
                 visitedNodes.push(currentNode);
                 // Update the adjacent nodes
-                updateAdjacentNodes(grid, currentNode);
+                updateAdjacentNodes(grid, currentNode, unvisitedNodes);
             }
         }
     }
@@ -44,29 +43,26 @@ export function getShortestPathDijkstra(finishNode) {
     return shortestPath;
 }
 
-// Utility funciton for sorting the unvisited nodes by distance
-function sortNodesByDistance(unvisitNodes) {
-    return unvisitNodes.sort((a, b) => a.distance - b.distance);
-}
-
-function getAllNodes(grid) {
-    const nodes = [];
-    for (const row of grid) {
-        for (const node of row) {
-            nodes.push(node);
-        }
-    }
-    return nodes;
-}
 
 // utility function for updating the current node's unvisited neighbors
-function updateAdjacentNodes(grid, currentNode) {
+function updateAdjacentNodes(grid, currentNode, minQueue) {
     const unvisitedAdjacentNodes = getAdjacentNodes(grid, currentNode);
     for( const  adjacentNode of unvisitedAdjacentNodes ) {
-        // update adjacent node's distance
-        adjacentNode.distance = currentNode.distance + 1;
+        // calculate the adjacentNode's distance through currentNode
+        let newDistance = currentNode.distance + 1;
         // update Adjacent node's previous node to current node
         adjacentNode.previousNode = currentNode;
+        if ( newDistance < adjacentNode.distance ) {
+            if ( adjacentNode.index === -1 ) {
+                adjacentNode.distance = newDistance;
+                adjacentNode.previousNode = currentNode;
+                minQueue.insert(adjacentNode);
+            }
+            else {
+                minQueue.changePrioirty(adjacentNode.index, newDistance);
+                adjacentNode.previousNode = currentNode;
+            }
+        }
     }
 }
 
@@ -79,7 +75,7 @@ function getAdjacentNodes(grid, node) {
     if( row > 0 ) neighborNodes.push( grid[row - 1][col] );
     if( row < grid.length - 1 ) neighborNodes.push( grid[row + 1][col] );
 
-    return neighborNodes.filter((neighbor) => !neighbor.isVisited);
+    return neighborNodes.filter((neighbor) => !neighbor.isVisited && ! neighbor.isWall);
 }
 
 // utility funciotn for initializing the node's distance to infinity
@@ -87,6 +83,7 @@ function prepareBoard(grid) {
     for( const row of grid ) {
         for( const node of row ) {
             node.distance = Infinity;
+            node.index = -1;
         }
     }
 }

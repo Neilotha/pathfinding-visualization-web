@@ -4,11 +4,13 @@ import Node from './Node/Node';
 import './PathfindingVisualization.css';
 import {dijkstra, getShortestPathDijkstra} from '../PathfindingAlgorithms/Dijkstra.js';
 import {aStar} from '../PathfindingAlgorithms/Astar.js';
-import {animateDijkstra, animateAStar} from './Animations.jsx';
+import {animateDijkstra, animateAStar, instantRenderDijkstra, instantRenderAStar} from './Animations.jsx';
 
 const TOGGLE_WALL = '1';
 const TOGGLE_START = '2';
 const TOGGLE_FINISH = '3';
+const DIJKSTRA = '1';
+const ASTAR = '2';
 
 export default class PathfindingVisualization extends Component {
   constructor(props) {
@@ -16,13 +18,16 @@ export default class PathfindingVisualization extends Component {
     this.state = {
       grid: [],
       mouseIsPressed: false,
-      // gotStart: false,
-      // gotFinish: false,
       draggingStart: false,
       draggngFinish: false,
+      wasSearched: false,
+      searchedAlgorithm: null
+      // gotStart: false,
+      // gotFinish: false,
       // wallToggled: false,
       // startToggled: false,
       // finishToggled: false
+      
     };
 
 
@@ -33,26 +38,33 @@ export default class PathfindingVisualization extends Component {
     this.setState({grid});
   }
 
-  visualizeDijkstra() {
-    this.handleClearSearch();
+  visualizeDijkstra(instantRender) {
+    this.clearPath();
     const {grid} = this.state;
     const finishNode = this.findFinishNode(grid);
     const startNode = this.findStartNode(grid);
     const visitedNodes = dijkstra(grid, startNode);
     const shortestPath = getShortestPathDijkstra(finishNode);
-    animateDijkstra(visitedNodes, shortestPath);
-
+    if ( instantRender ) instantRenderDijkstra(visitedNodes, shortestPath);
+    else {
+      animateDijkstra(visitedNodes, shortestPath);
+      this.setState({wasSearched: true, searchedAlgorithm: DIJKSTRA});
+    }
   }
 
-  visualizeAstar() {
-    this.handleClearSearch();
+  visualizeAstar(instantRender) {
+    this.clearPath();
     const {grid} = this.state;
     const finishNode = this.findFinishNode(grid);
     const startNode = this.findStartNode(grid);
     const results = aStar(grid, startNode, finishNode);
     const visitedNodes = results[0];
     const shortestPath = results[1];
-    animateAStar(visitedNodes, shortestPath);
+    if ( instantRender ) instantRenderAStar(visitedNodes, shortestPath);
+    else {
+      animateAStar(visitedNodes, shortestPath);
+      this.setState({wasSearched: true, searchedAlgorithm: ASTAR});
+    }
   }
 
 
@@ -142,11 +154,19 @@ export default class PathfindingVisualization extends Component {
       if ( this.state.draggingStart && !this.state.grid[row][col].isFinish ) {
         const newGrid = dragStartOrFinishNode( this.findStartNode( this.state.grid ), this.state.grid, true, row, col );
         this.setState( { grid: newGrid } );
+        if ( this.state.wasSearched && this.state.searchedAlgorithm !== null ) {
+          if ( this.state.searchedAlgorithm === DIJKSTRA ) this.visualizeDijkstra( true );
+          else if ( this.state.searchedAlgorithm === ASTAR ) this.visualizeAstar( true );
+        } 
       }
       //  Dragging finish node, putting down finish node if start node isn't already there
       else if ( this.state.draggngFinish && !this.state.grid[row][col].isStart ) {
         const newGrid = dragStartOrFinishNode( this.findFinishNode( this.state.grid ), this.state.grid, false, row, col );
         this.setState( { grid: newGrid } );
+        if ( this.state.wasSearched && this.state.searchedAlgorithm !== null ) {
+          if ( this.state.searchedAlgorithm === DIJKSTRA ) this.visualizeDijkstra( true );
+          else if ( this.state.searchedAlgorithm === ASTAR ) this.visualizeAstar( true );
+        } 
       }
       // Adding wall node
       // else if (this.state.wallToggled && this.validateAction(row, col, TOGGLE_WALL)) {
@@ -161,7 +181,7 @@ export default class PathfindingVisualization extends Component {
   handleMouseUp() {
     const wasDragging = this.state.draggingStart || this.state.draggngFinish;
     this.setState({mouseIsPressed: false, draggingStart: false, draggngFinish: false});
-    if ( wasDragging ) this.handleClearSearch();
+    // if ( wasDragging ) this.handleClearSearch();
   }
 
   handleWallToggle() {
@@ -178,7 +198,7 @@ export default class PathfindingVisualization extends Component {
 
   // Resets the whole state
   handleReset() {
-    const list = document.querySelectorAll('.visited, .shortestPath'); 
+    const list = document.querySelectorAll('.visited, .shortestPath, .visited-instant, .shortestPath-instant'); 
     for (let i = 0; i < list.length; i ++) {
       list[i].className = 'node';
     }
@@ -187,6 +207,10 @@ export default class PathfindingVisualization extends Component {
     this.setState({
       grid: newGrid,
       mouseIsPressed: false,
+      draggingStart: false,
+      draggngFinish: false,
+      wasSearched: false,
+      searchedAlgorithm: null
       // gotStart: false,
       // gotFinish: false,
       // wallToggled: false
@@ -196,7 +220,7 @@ export default class PathfindingVisualization extends Component {
   // Clear the previous search result
   handleClearSearch() {
     const gridCoppy = this.state.grid.slice();
-    const list = document.querySelectorAll('.visited, .shortestPath'); 
+    const list = document.querySelectorAll('.visited, .shortestPath, .visited-instant, .shortestPath-instant'); 
     for (let i = 0; i < list.length; i ++) {
       list[i].className = 'node';
     }
@@ -211,8 +235,28 @@ export default class PathfindingVisualization extends Component {
     this.setState({
       grid: gridCoppy,
       mouseIsPressed: false,
+      draggingStart: false,
+      draggngFinish: false,
+      wasSearched: false,
+      searchedAlgorithm: null
       // wallToggled: false
     });
+  }
+
+  clearPath() {
+    const gridCoppy = this.state.grid.slice();
+    const list = document.querySelectorAll('.visited, .shortestPath, .visited-instant, .shortestPath-instant'); 
+    for (let i = 0; i < list.length; i ++) {
+      list[i].className = 'node';
+    }
+
+    for( const row of gridCoppy ) {
+      for( const node of row ) {
+        node.previousNode = null;
+        node.isVisited = false;
+      }
+    }
+
   }
 
   // Clear wall node and search result 
@@ -222,7 +266,6 @@ export default class PathfindingVisualization extends Component {
 
     for( let row = 0; row < gridCoppy.length; row ++ ) {
       for( let col = 0; col < gridCoppy[0].length; col ++ ) {
-        console.log(gridCoppy[row][col]);
         if( gridCoppy[row][col].isWall ) {
           gridCoppy[row][col] = initializeNode(row, col);
         }
@@ -241,12 +284,12 @@ export default class PathfindingVisualization extends Component {
     return (
       <>
         <div className="panel">
-          <h1 className='title'>Pathfinding Visualization</h1>
+          <h1 className='title'>Pathfinding Visualization test</h1>
           <div className='btn-group' role="group">
-            <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeDijkstra()}>
+            <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeDijkstra( false )}>
               Visualize Dijkstra's Algorithm
             </button>
-            <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeAstar()}>
+            <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeAstar( false )}>
               Visualize A* Algorithm
             </button>
           </div>
