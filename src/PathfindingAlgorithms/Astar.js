@@ -1,6 +1,8 @@
+import { MinPriorityQueue } from "./MinPrioirtyQueue_AStar";
+
 export function aStar(grid, startNode, targetNode) {
     // Initial 2 lists: open and closed
-    const openList = [];
+    const openList = new MinPriorityQueue();
     const closedList = [];
     const nodeVisitOrder = [];
     const results = [];
@@ -8,13 +10,13 @@ export function aStar(grid, startNode, targetNode) {
     
     prePareNodes(grid);
     // Push the starting node to the open list and set the f-value to  0
+    startNode.distance = 0;
     startNode.h = 0;
     startNode.g = 0;
-    openList.push(startNode);
-    while(openList.length > 0 && !finishSearch) {
+    openList.insert(startNode);
+    while(openList.size > 0 && !finishSearch) {
         // Find the node with the smallest f-value on the open list and pop it
-        const currentNode = getNearestNode(openList);
-        removeElement(openList, currentNode);
+        const currentNode = openList.extractMin();
         // Push currentNode to closed list
         closedList.push(currentNode);
         // If the currentNode is the goal, stop the search
@@ -30,7 +32,7 @@ export function aStar(grid, startNode, targetNode) {
                 const successorNewF = calculateFValue(currentNode, targetNode, successor);
                 // If the new path to neighbor has better g-value than the current best path
                 // and the neighbor is already in the closed list
-                if( successorNewF[0] < successor.g && checkIfExist(closedList, successor) ) {
+                if( successorNewF[0] < successor.g && closedList.includes(successor, 0) ) {
                     // replace the neighbor with the new, lower, g value 
                     // current node is now the neighbor's parent 
                     successor.g = successorNewF[0];
@@ -38,19 +40,20 @@ export function aStar(grid, startNode, targetNode) {
                 }
                 // else if the new path to neighbor has better g-value than the current best path
                 // and the neighbor is already in the open list
-                else if( successorNewF[0] < successor.g && checkIfExist(openList, successor) ) {
+                else if( successorNewF[0] < successor.g && successor.inQueue ) {
                     //  replace the neighbor with the new, lower, g value 
                     //  change the neighbor's parent to our current node
-                    successor.g = successorNewF[0];
+                    openList.changePrioirty(openList.getIndex(successor) , successor.h, successorNewF[0] )
                     successor.previousNode = currentNode;
                 }
                 // else if this neighbor is not in both lists
-                else if( !checkIfExist(closedList, successor) && !checkIfExist(openList, successor) ) {
+                else if( !closedList.includes(successor, 0) && !successor.inQueue ) {
                     // add it to the open list and set its g and h
                     successor.previousNode = currentNode;
                     successor.g = successorNewF[0];
                     successor.h = successorNewF[1];
-                    openList.push(successor);
+                    successor.distance = successorNewF[0] + successorNewF[1];
+                    openList.insert(successor);
                 }
 
             }
@@ -66,8 +69,10 @@ export function aStar(grid, startNode, targetNode) {
 function prePareNodes(grid) {
     for (const row of grid) {
         for (const node of row) {
+            node.distance = Infinity;
             node.g = Infinity;
             node.h = Infinity;
+            node.inQueue = false;
         }
     }
 }
@@ -92,37 +97,6 @@ function calculateFValue(currentNode, finishNode, successor) {
     return fValue;
 }
 
-// Utility function for finding the node with the smallest f-value on the open list
-function getNearestNode(openList) {
-    let nearestNode = openList[0];
-    for( const node of openList ) {
-        if( (node.h + node.g) < (nearestNode.h + nearestNode.g) ) nearestNode = node;
-        else if(  (node.h + node.g) === (nearestNode.h + nearestNode.g) ) {
-            if( node.h < nearestNode.h ) nearestNode = node;
-        }
-    }
-
-    return nearestNode;
-}
-
-// Utility function for removing specific element from array
-function removeElement(arr, element) {
-    for( var i = 0 ; i < arr.length; i++ ) {
-        if( arr[i] === element ) {
-            arr.splice(i, 1);
-        }
-    }
-}
-
-// Utility function for checking if node is in the array
-function checkIfExist(arr, targetNode) {
-    let result = false;
-    for( const node of arr ) {
-        if( node.col === targetNode.col && node.row === targetNode.row ) result = true;
-    }
-
-    return result;
-}
 
 function getShortestPath(finishNode) {
     const shortestPath = [];
