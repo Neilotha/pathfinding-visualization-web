@@ -53,13 +53,13 @@ function updateAdjacentNodes(grid, currentNode, minQueue) {
         // update Adjacent node's previous node to current node
         adjacentNode.previousNode = currentNode;
         if ( newDistance < adjacentNode.distance ) {
-            if ( adjacentNode.index === -1 ) {
+            if ( !adjacentNode.inQueue ) {
                 adjacentNode.distance = newDistance;
                 adjacentNode.previousNode = currentNode;
                 minQueue.insert(adjacentNode);
             }
             else {
-                minQueue.changePrioirty(adjacentNode.index, newDistance);
+                minQueue.changePrioirty(minQueue.getIndex(adjacentNode), newDistance);
                 adjacentNode.previousNode = currentNode;
             }
         }
@@ -83,7 +83,7 @@ function prepareBoard(grid) {
     for( const row of grid ) {
         for( const node of row ) {
             node.distance = Infinity;
-            node.index = -1;
+            node.inQueue = false;
         }
     }
 }

@@ -1,3 +1,4 @@
+import { thisExpression } from "@babel/types";
 
 export class MinPriorityQueue {
     constructor() {
@@ -25,8 +26,6 @@ export class MinPriorityQueue {
         let temp = this.heap[i];
         this.heap[i] = this.heap[j];
         this.heap[j] = temp;
-        this.heap[i].index = i;
-        this.heap[j].index = j;
     }
 
     // function to shift up the node in order to maintain the heap property
@@ -68,19 +67,19 @@ export class MinPriorityQueue {
     insert(p) {
         this.size = this.size + 1;
         this.heap.push(p);
-        this.heap[this.size - 1].index = this.size - 1;
+        this.heap[this.size - 1].inQueue = true;
         this.shiftUp(this.size - 1);
     }
 
     extractMin() {
         let result = this.heap[0];
+        result.inQueue = false;
         this.size = this.size - 1;
 
         if ( this.size === 0 ) {
             this.heap.pop()
         }
         else {
-            // Replace the value of the root with the last leaf
             this.heap.shift();
 
             // maintain the heap property
@@ -110,5 +109,10 @@ export class MinPriorityQueue {
 
         this.extractMin();
     }
+
+    getIndex(node) {
+        return this.heap.indexOf(node);
+    }
+    
 
 }
