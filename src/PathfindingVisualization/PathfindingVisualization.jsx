@@ -284,7 +284,7 @@ export default class PathfindingVisualization extends Component {
     return (
       <>
         <div className="panel">
-          <h1 className='title'>Pathfinding Visualization test</h1>
+          <h1 className='title'>Pathfinding Visualization</h1>
           <div className='btn-group' role="group">
             <button type="button" className="btn btn-outline-light" onClick={() => this.visualizeDijkstra( false )}>
               Visualize Dijkstra's Algorithm
